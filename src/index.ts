@@ -1,5 +1,5 @@
 export { NaturalSQL } from "./api.js";
-export type { NaturalSQLOptions, BuildVectorDbResult } from "./api.js";
+export type { NaturalSQLOptions, BuildVectorDbResult, BuildVectorDbOptions, SearchOptions } from "./api.js";
 export type { AppConfig, VectorBackend, EmbeddingProviderType } from "./utils/config.js";
 export { createConfig } from "./utils/config.js";
 export { buildPrompt } from "./utils/prompt.js";

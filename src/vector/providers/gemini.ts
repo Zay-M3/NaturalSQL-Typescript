@@ -1,11 +1,11 @@
 import { EmbeddingProvider } from "./base.js";
 
 export class GeminiEmbeddingProvider extends EmbeddingProvider {
-    async embedDocuments(documents: string[]): Promise<number[][]> {
-        return documents.map(() => []);
+    protected async doEmbedDocuments(documents: string[]): Promise<number[][]> {
+        return documents.map(() => [0]);
     }
 
-    async embedQuery(_query: string): Promise<number[]> {
-        return [];
+    protected async doEmbedQuery(_query: string): Promise<number[]> {
+        return [0];
     }
 }

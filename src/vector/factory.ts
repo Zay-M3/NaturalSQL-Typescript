@@ -23,13 +23,19 @@ export async function createVectorStore(
     _storagePath: string,
     _reset = false
 ): Promise<VectorStore> {
+    let store: VectorStore;
+
     if (config.vectorBackend === "chroma") {
-        return new ChromaVectorStore();
+        store = new ChromaVectorStore();
+    } else if (config.vectorBackend === "sqlite") {
+        store = new SQLiteVectorStore();
+    } else {
+        throw new Error(`Unknown vector backend: ${String(config.vectorBackend)}`);
     }
 
-    if (config.vectorBackend === "sqlite") {
-        return new SQLiteVectorStore();
+    if (_reset) {
+        await store.reset();
     }
 
-    throw new Error(`Unknown vector backend: ${String(config.vectorBackend)}`);
+    return store;
 }

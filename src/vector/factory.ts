@@ -26,20 +26,20 @@ export async function createEmbeddingProvider(config: AppConfig): Promise<Embedd
 
 export async function createVectorStore(
     config: AppConfig,
-    _storagePath: string,
-    _reset = false
+    storagePath: string,
+    reset = false
 ): Promise<VectorStore> {
     let store: VectorStore;
 
     if (config.vectorBackend === "chroma") {
-        store = new ChromaVectorStore();
+        store = new ChromaVectorStore({ storagePath, resetOnStart: reset });
     } else if (config.vectorBackend === "sqlite") {
-        store = new SQLiteVectorStore();
+        store = new SQLiteVectorStore({ storagePath, resetOnStart: reset });
     } else {
         throw new Error(`Unknown vector backend: ${String(config.vectorBackend)}`);
     }
 
-    if (_reset) {
+    if (reset) {
         await store.reset();
     }
 

@@ -10,7 +10,7 @@ import { SQLiteVectorStore } from "../../src/vector/stores/sqliteStore.js";
 describe("vector factory", () => {
     it("enruta embedding provider local y gemini", async () => {
         const localConfig = createConfig({ embeddingProvider: "local" });
-        const geminiConfig = createConfig({ embeddingProvider: "gemini" });
+        const geminiConfig = createConfig({ embeddingProvider: "gemini", geminiApiKey: "test-key" });
 
         await expect(createEmbeddingProvider(localConfig)).resolves.toBeInstanceOf(LocalTransformersProvider);
         await expect(createEmbeddingProvider(geminiConfig)).resolves.toBeInstanceOf(GeminiEmbeddingProvider);

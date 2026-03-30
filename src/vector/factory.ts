@@ -8,11 +8,17 @@ import { SQLiteVectorStore } from "./stores/sqliteStore.js";
 
 export async function createEmbeddingProvider(config: AppConfig): Promise<EmbeddingProvider> {
     if (config.embeddingProvider === "local") {
-        return new LocalTransformersProvider();
+        return new LocalTransformersProvider({
+            device: config.device,
+            normalizeEmbeddings: config.normalizeEmbeddings
+        });
     }
 
     if (config.embeddingProvider === "gemini") {
-        return new GeminiEmbeddingProvider();
+        return new GeminiEmbeddingProvider({
+            apiKey: config.geminiApiKey,
+            model: config.geminiEmbeddingModel
+        });
     }
 
     throw new Error(`Unknown embedding provider: ${String(config.embeddingProvider)}`);

@@ -10,10 +10,10 @@ describe("ChromaVectorStore", () => {
         };
 
         const fakeCollection = {
-            async upsert() {
+            async upsert(_input: { documents: string[]; ids: string[]; embeddings: number[][] }) {
                 state.upserts += 1;
             },
-            async query() {
+            async query(_input: { query_embeddings: number[][]; n_results: number }) {
                 return {
                     documents: [["users", "orders", "products"]],
                     distances: [[0.01, 0.2, 0.9]]
@@ -22,10 +22,10 @@ describe("ChromaVectorStore", () => {
         };
 
         const fakeClient = {
-            async getOrCreateCollection() {
+            async getOrCreateCollection(_input: { name: string; embeddingFunction: null }) {
                 return fakeCollection;
             },
-            async deleteCollection() {
+            async deleteCollection(_input: { name: string }) {
                 state.deleted += 1;
             }
         };
@@ -36,11 +36,11 @@ describe("ChromaVectorStore", () => {
             resetOnStart: false,
             loader: async () => ({
                 ChromaClient: class {
-                    constructor() {
+                    constructor(_input: { path: string }) {
                         return fakeClient;
                     }
                 }
-            })
+            }) as any
         });
 
         await store.add(["a"], ["users"], [[1, 0]]);

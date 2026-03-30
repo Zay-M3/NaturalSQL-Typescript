@@ -38,7 +38,7 @@
 		"typecheck": "tsc --noEmit",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"prepublishOnly": "npm run build && npm run typecheck"
+		"prepublishOnly": "npm run test && npm run typecheck && npm run build"
 	},
 	"peerDependencies": {
 		"@google/generative-ai": ">=0.21.0",

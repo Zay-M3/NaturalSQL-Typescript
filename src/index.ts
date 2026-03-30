@@ -1,7 +1,9 @@
 export { NaturalSQL } from "./api.js";
 export type { NaturalSQLOptions, BuildVectorDbResult } from "./api.js";
 export type { AppConfig, VectorBackend, EmbeddingProviderType } from "./utils/config.js";
+export { createConfig } from "./utils/config.js";
 export { buildPrompt } from "./utils/prompt.js";
+export { CONNECTION_TEMPLATES, IGNORE_TABLE, IGNORE_TABLES } from "./utils/constants.js";
 
 export { EmbeddingProvider } from "./vector/providers/base.js";
 export { VectorStore } from "./vector/stores/base.js";

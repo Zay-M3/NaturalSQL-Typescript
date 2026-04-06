@@ -1,6 +1,6 @@
 {
 	"name": "naturalsql",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Generate SQL from natural language using DB schema + vector retrieval",
 	"author": "NaturalSQL Contributors",
 	"license": "Apache-2.0",

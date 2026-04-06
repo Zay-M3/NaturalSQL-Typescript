@@ -13,6 +13,11 @@ type TransformersModule = {
     ) => Promise<TransformersExtractor>;
 };
 
+type TensorLike = {
+    dims?: unknown;
+    data?: unknown;
+};
+
 type LocalProviderOptions = {
     model?: string;
     device?: string;
@@ -95,6 +100,11 @@ export class LocalTransformersProvider extends EmbeddingProvider {
     }
 
     private extractRows(raw: unknown): number[][] {
+        const rowsFromTensor = this.extractTensorRows(raw);
+        if (rowsFromTensor !== null) {
+            return rowsFromTensor;
+        }
+
         if (Array.isArray(raw)) {
             if (raw.length === 0) {
                 return [];
@@ -107,6 +117,10 @@ export class LocalTransformersProvider extends EmbeddingProvider {
             return [this.toNumberArray(raw)];
         }
 
+        if (ArrayBuffer.isView(raw)) {
+            return [this.toNumberArray(raw)];
+        }
+
         const maybeData = (raw as { data?: unknown } | null)?.data;
         if (maybeData !== undefined) {
             return this.extractRows(maybeData);
@@ -115,9 +129,61 @@ export class LocalTransformersProvider extends EmbeddingProvider {
         throw new Error("Unable to parse embeddings returned by @xenova/transformers");
     }
 
+    private extractTensorRows(raw: unknown): number[][] | null {
+        if (!raw || typeof raw !== "object") {
+            return null;
+        }
+
+        const tensor = raw as TensorLike;
+        if (!Array.isArray(tensor.dims)) {
+            return null;
+        }
+
+        const dims = tensor.dims;
+        if (!dims.every((dim) => Number.isInteger(dim) && (dim as number) >= 0)) {
+            throw new Error("Unable to parse embeddings returned by @xenova/transformers");
+        }
+
+        const data = this.toNumberArray(tensor.data);
+
+        if (dims.length === 0) {
+            if (data.length === 0) {
+                return [];
+            }
+            return [data];
+        }
+
+        if (dims.length === 1) {
+            const vectorSize = dims[0] as number;
+            if (vectorSize !== data.length) {
+                throw new Error("Unable to parse embeddings returned by @xenova/transformers");
+            }
+            return [data];
+        }
+
+        const rowCount = dims[0] as number;
+        const rowSize = dims.slice(1).reduce((acc, size) => acc * (size as number), 1);
+
+        if (rowCount * rowSize !== data.length) {
+            throw new Error("Unable to parse embeddings returned by @xenova/transformers");
+        }
+
+        const rows: number[][] = [];
+        for (let row = 0; row < rowCount; row += 1) {
+            const start = row * rowSize;
+            rows.push(data.slice(start, start + rowSize));
+        }
+
+        return rows;
+    }
+
     private toNumberArray(value: unknown): number[] {
         if (!Array.isArray(value)) {
             if (ArrayBuffer.isView(value)) {
+                if (!("length" in value) || typeof (value as { length: unknown }).length !== "number") {
+                    throw new Error("Unable to parse embeddings returned by @xenova/transformers");
+                }
+
                 const result: number[] = [];
                 const view = value as unknown as { readonly length: number; [index: number]: unknown };
 
